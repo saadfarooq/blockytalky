@@ -120,7 +120,7 @@ class HardwareDaemon(object):
             valuesChanged = True
             self.sensorsRequested = False
         
-        if not valuesChanged: print "no values seem to have changed"
+        #if not valuesChanged: print "no values seem to have changed"
 
         if valuesChanged:
             s1 = sensors[0]
@@ -197,6 +197,7 @@ class HardwareDaemon(object):
 
         
     def handle_hwcmd_delivery(self, channel, method, header, body):
+        print "got hwcmd message"
         logger.info("hwcmd command received: " + body)
         command = Message.decode(body)
         if command.channel == "Sensor":
