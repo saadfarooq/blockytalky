@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+"""  
+currently reads on hwval channel from the hardware daemon and can send
+commands on the hwcmd channel to the hardware daemon.  the self.robot object
+is updated when messages are received.  this needs to be changed such that 
+there is only one channel that it listens on, with different exchanges for
+hwval and messages from dax.
+
+the user code section still has to be implemented.  the old version of this
+file can be found in us_old.py
+"""
+
 import time
 import thread
 import logging
@@ -42,6 +53,9 @@ class UserScript(object):
 
         self.hwval_channel = None
         self.hwcmd_channel = None
+        
+        self.MsgIn_channel = None
+        self.MsgOut_channel = None
 
         parameters = pika.ConnectionParameters()
         self.connection = pika.BlockingConnection(parameters)
@@ -64,8 +78,7 @@ class UserScript(object):
         logger.info("Declaring HwVal callback...")
         self.hwval_channel.basic_consume(self.handle_hwval_delivery, queue=queue_name, no_ack=True)
     
-
-
+  
     def handle_hwval_delivery(self, ch, method, properties, body):
         #print " [us] %r" % (body,)
         toSend = Message("asdf", None, "HwCmd", Message.createImage(motor1=100))
@@ -96,15 +109,3 @@ if __name__ == "__main__":
     handle_logging(logger)
     us = UserScript()
     
-    """
-    #starts up sensors channel
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-    channel.exchange_declare(exchange='sensors', type='fanout')
-    result = channel.queue_declare(exclusive=True)
-    queue_name = result.method.queue
-    channel.queue_bind(exchange='sensors', queue=queue_name)
-
-    channel.basic_consume(us.callback, queue=queue_name, no_ack=True)
-    channel.start_consuming()
-    """
