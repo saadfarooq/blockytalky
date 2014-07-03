@@ -176,7 +176,7 @@ class HardwareDaemon(object):
                                          )
             statusMessage = Message(self.hostname, None, "HwVal", content)
             statusMessage = Message.encode(statusMessage)
-            print("Writing hardware update to sensors/HwVal: " + statusMessage)
+            #print("Writing hardware update to sensors/HwVal: " + statusMessage)
             self.hwval_channel.basic_publish(exchange='sensors', routing_key='', body=statusMessage)
 
 
@@ -190,14 +190,15 @@ class HardwareDaemon(object):
     
     def setup_hwcmd_channel(self):
         self.hwcmd_channel = self.connection.channel()
-        self.hwcmd_channel.queue_declare(queue="HwCmd")
-        
-        logger.info("Declaring HwCmd callback...")  
-        self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, queue='HwCmd', no_ack=True)
-
+        self.hwcmd_channel.exchange_declare(exchange='HwCmd', type='fanout')
+        result = self.hwcmd_channel.queue_declare(exclusive=True)
+        queue_name = result.method.queue
+        self.hwcmd_channel.queue_bind(exchange='HwCmd', queue=queue_name)
+        self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, 
+                                    queue=queue_name, no_ack = True)
         
     def handle_hwcmd_delivery(self, channel, method, header, body):
-        print "got hwcmd message"
+        print "hw daemon received hwcmd message"
         logger.info("hwcmd command received: " + body)
         command = Message.decode(body)
         if command.channel == "Sensor":
@@ -228,12 +229,9 @@ class HardwareDaemon(object):
 
         else:
             hwDict = command.getContent()
-            if command == self.prevMessage:
-                # Message is the same, do nothing
-                #logging.info("Message same!")
+            if command == self.prevMessage: # Message is the same, do nothing
                 pass
             else:
-                #print "new stuff!"
                 for key, valueList in hwDict.iteritems():
                     for index, value in enumerate(valueList):
                         if value is not None:

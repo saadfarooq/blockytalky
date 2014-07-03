@@ -50,11 +50,11 @@ class UserScript(object):
         self.setup_hwval_channel()      
         self.hwval_channel.start_consuming()
    
-    def setup_hwcmd_channel(self):
-       
+    def setup_hwcmd_channel(self):  
         self.hwcmd_channel = self.connection.channel()
-        self.hwcmd_channel.queue_declare(queue="HwCmd")
-  
+        logger.info("Creating sensors exchange...")
+        self.hwcmd_channel.exchange_declare(exchange='HwCmd', type='fanout')
+
     def setup_hwval_channel(self):
         self.hwval_channel = self.connection.channel()
         self.hwval_channel.exchange_declare(exchange='sensors', type='fanout')
@@ -67,10 +67,28 @@ class UserScript(object):
 
 
     def handle_hwval_delivery(self, ch, method, properties, body):
-        print " [us] %r" % (body,)
+        #print " [us] %r" % (body,)
         toSend = Message("asdf", None, "HwCmd", Message.createImage(motor1=100))
         toSend = Message.encode(toSend)
-        self.hwcmd_channel.basic_publish(exchange='', routing_key="HwCmd", body=toSend)
+
+        self.hwcmd_channel.basic_publish(exchange='HwCmd', routing_key=''
+                                         , body=toSend)
+   
+        
+        message = Message.decode(body)
+        hwDict = message.getContent()
+        logger.debug('Updating the robot status: %s' % str(hwDict))
+        
+        # update value changes
+        for key, valueList in hwDict.iteritems():
+            for index, value in enumerate(valueList):
+                if value is not None:
+                    self.robot[key][index] = value
+                    
+        # there is unread data on all ports
+        for sensor in self.sensorStatus:
+            self.sensorStatus[sensor] = True
+        
   
 
 if __name__ == "__main__":
