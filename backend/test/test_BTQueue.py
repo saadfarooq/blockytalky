@@ -1,19 +1,17 @@
 #!/usr/bin/python
 import unittest
-from mock import Mock
+from mock import MagicMock
 
 from BTQueue import BTQueue
 
 class test_BTQueue(unittest.TestCase):
 
   def test_pub_sub(self):
-    bt = BTQueue()
-    bt.publish(message='someone', routing_key='key')
-    f = Mock()
+    bt = BTQueue('HwCmd')
+    bt.publish(message='someone')
+    f = MagicMock()
     bt.subscribe(f)
-    print 'test pub sub'
-    # self.assertIsNotNone(bt)
-    f.assert_called_with('someone')
+    f.assert_called_once()
 
 
 if __name__ == '__main__':
