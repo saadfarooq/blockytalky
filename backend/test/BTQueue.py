@@ -18,8 +18,8 @@ class BTQueue(object):
 
     def publish(self, message):
         self.__channel().basic_publish(exchange='',
-                                   routing_key=self.queue_name,
-                                   body=message)
+                                       routing_key=self.queue_name,
+                                       body=message)
         self.__close()
 
     def subscribe(self, callback):
