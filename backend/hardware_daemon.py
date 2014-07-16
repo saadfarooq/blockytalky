@@ -47,7 +47,7 @@ class HardwareDaemon(object):
         
     def start(self):
         self.schedule_check_status()
-        print "--------- Starting consuming ------------"
+        logger.info("--------- Starting consuming ------------")
         self.hwcmd_channel.start_consuming()
     
     def schedule_check_status(self):
