@@ -33,8 +33,17 @@ class HardwareDaemon(object):
         
         parameters = pika.ConnectionParameters()
         self.connection = pika.BlockingConnection(parameters)
-        self.setup_hwval_channel()
-        self.setup_hwcmd_channel()
+        
+        ##fixme:  document what the below line of code is for.  Joe???
+        self.prevMessage = Message("none", None, "HwCmd", Message.createImage(pin11=2))       
+        self.hwval_channel = self.connection.channel()
+        logger.info("Creating sensors exchange...")
+        self.hwval_channel.exchange_declare(exchange='sensors', type='fanout')
+
+        self.hwcmd_channel = self.connection.channel()
+        self.hwcmd_channel.queue_declare(queue="HwCmd")     
+        logger.info("Declaring HwCmd callback...")  
+        self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, queue='HwCmd', no_ack=True)
         
         initPins()
         BrickPiSetup()
@@ -184,23 +193,6 @@ class HardwareDaemon(object):
             #print str(sensors[0]) + " " + str(sensors[1]) + " " + str(sensors[2]) + " " + str(sensors[3])
             print("Writing hardware update to sensors/HwVal: " + statusMessage)
             self.hwval_channel.basic_publish(exchange='sensors', routing_key='', body=statusMessage)
-
-
-    def setup_hwval_channel(self):
-        ##fixme:  document what the below line of code is for.  Joe???
-        self.prevMessage = Message("none", None, "HwCmd", Message.createImage(pin11=2))
-        
-        self.hwval_channel = self.connection.channel()
-        logger.info("Creating sensors exchange...")
-        self.hwval_channel.exchange_declare(exchange='sensors', type='fanout')
-    
-    def setup_hwcmd_channel(self):
-        self.hwcmd_channel = self.connection.channel()
-        self.hwcmd_channel.queue_declare(queue="HwCmd")
-        
-        logger.info("Declaring HwCmd callback...")  
-        self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, queue='HwCmd', no_ack=True)
-
         
     def handle_hwcmd_delivery(self, channel, method, header, body):
         logger.info("hwcmd command received: " + body)
