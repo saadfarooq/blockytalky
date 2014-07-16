@@ -28,22 +28,25 @@ class HardwareDaemon(object):
         self.robot = Message.initStatus()
         self.sensorList = [0,0,0,0]
         self.sensorsRequested = False
-        self.hwval_channel = None
-        self.hwcmd_channel = None
         
-        parameters = pika.ConnectionParameters()
-        self.connection = pika.BlockingConnection(parameters)
+        # self.hwval_channel = None
+        # self.hwcmd_channel = None
         
-        ##fixme:  document what the below line of code is for.  Joe???
-        self.prevMessage = Message("none", None, "HwCmd", Message.createImage(pin11=2))       
-        self.hwval_channel = self.connection.channel()
-        logger.info("Creating sensors exchange...")
-        self.hwval_channel.exchange_declare(exchange='sensors', type='fanout')
+        # parameters = pika.ConnectionParameters()
+        # self.connection = pika.BlockingConnection(parameters)
+        
+        # ##fixme:  document what the below line of code is for.  Joe???
+        # self.prevMessage = Message("none", None, "HwCmd", Message.createImage(pin11=2))       
+        # self.hwval_channel = self.connection.channel()
+        # logger.info("Creating sensors exchange...")
+        # self.hwval_channel.exchange_declare(exchange='sensors', type='fanout')
 
-        self.hwcmd_channel = self.connection.channel()
-        self.hwcmd_channel.queue_declare(queue="HwCmd")     
-        logger.info("Declaring HwCmd callback...")  
-        self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, queue='HwCmd', no_ack=True)
+        # self.hwcmd_channel = self.connection.channel()
+        # self.hwcmd_channel.queue_declare(queue="HwCmd")     
+        # logger.info("Declaring HwCmd callback...")  
+        # self.hwcmd_channel.basic_consume(self.handle_hwcmd_delivery, queue='HwCmd', no_ack=True)
+
+        self.sensorsQueue = BTQueue('sensors')
         
         initPins()
         BrickPiSetup()
@@ -59,7 +62,7 @@ class HardwareDaemon(object):
         logger.info("+++++++++++++++++++++++++++++++++++++++++")
         logger.info("--------- Starting consuming ------------")
         logger.info("+++++++++++++++++++++++++++++++++++++++++")
-        self.hwcmd_channel.start_consuming()
+        self.sensorsQueue.subscribe(self.handle_hwcmd_delivery)
     
     def schedule_check_status(self):
         # logger.info("Scheduling a check_status in %s seconds" % self.__class__.PUBLISH_INTERVAL)
