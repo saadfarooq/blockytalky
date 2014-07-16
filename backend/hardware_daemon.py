@@ -58,7 +58,7 @@ class HardwareDaemon(object):
         BrickPiSetupSensors()
         
     def start(self):
-        self.schedule_check_status()
+        # self.schedule_check_status()
         logger.info("+++++++++++++++++++++++++++++++++++++++++")
         logger.info("--------- Starting consuming ------------")
         logger.info("+++++++++++++++++++++++++++++++++++++++++")
@@ -66,7 +66,7 @@ class HardwareDaemon(object):
     
     def schedule_check_status(self):
         # logger.info("Scheduling a check_status in %s seconds" % self.__class__.PUBLISH_INTERVAL)
-        self.connection.add_timeout(self.__class__.PUBLISH_INTERVAL, self.check_status_and_reschedule)   
+        # self.connection.add_timeout(self.__class__.PUBLISH_INTERVAL, self.check_status_and_reschedule)   
 
     def check_status_and_reschedule(self):
         self.check_status()
