@@ -64,7 +64,7 @@ class HardwareDaemon(object):
         logger.info("+++++++++++++++++++++++++++++++++++++++++")
         self.sensorsQueue.subscribe(self.handle_hwcmd_delivery)
     
-    def schedule_check_status(self):
+    # def schedule_check_status(self):
         # logger.info("Scheduling a check_status in %s seconds" % self.__class__.PUBLISH_INTERVAL)
         # self.connection.add_timeout(self.__class__.PUBLISH_INTERVAL, self.check_status_and_reschedule)   
 
