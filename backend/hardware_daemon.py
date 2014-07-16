@@ -13,6 +13,7 @@ import pika
 from blockytalky_id import *
 from message import *
 from BrickPi import *
+from btqueue import BTQueue
 
 channel = None
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ class HardwareDaemon(object):
         
     def start(self):
         self.schedule_check_status()
+        print "--------- Starting consuming ------------"
         self.hwcmd_channel.start_consuming()
     
     def schedule_check_status(self):
