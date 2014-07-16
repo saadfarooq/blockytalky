@@ -51,7 +51,7 @@ class HardwareDaemon(object):
         self.hwcmd_channel.start_consuming()
     
     def schedule_check_status(self):
-        logger.info("Scheduling a check_status in %s seconds" % self.__class__.PUBLISH_INTERVAL)
+        # logger.info("Scheduling a check_status in %s seconds" % self.__class__.PUBLISH_INTERVAL)
         self.connection.add_timeout(self.__class__.PUBLISH_INTERVAL, self.check_status_and_reschedule)   
 
     def check_status_and_reschedule(self):
