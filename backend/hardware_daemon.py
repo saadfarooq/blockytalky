@@ -79,7 +79,7 @@ class HardwareDaemon(object):
             logger.exception('Error occurred while reading motor values:')
 
         BrickPi.Gpio = self.robot["pins"]
-        logger.info("Calling BrickPiUpdateValues")
+        # logger.info("Calling BrickPiUpdateValues")
         BrickPiUpdateValues()
 
         #Copy sensors and encoders for comparison.
