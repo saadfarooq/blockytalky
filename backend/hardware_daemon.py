@@ -123,7 +123,7 @@ class HardwareDaemon(object):
             valuesChanged = True
             self.sensorsRequested = False
         
-        if not valuesChanged: print "no values seem to have changed"
+        # if not valuesChanged: print "no values seem to have changed"
 
         if valuesChanged:
             s1 = sensors[0]
