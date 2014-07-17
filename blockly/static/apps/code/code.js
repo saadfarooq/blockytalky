@@ -308,7 +308,7 @@ var d = new Date();
 var previousTime = d.getTime();
 
 var on_connect = function() {
-        client.subscribe("/queue/HwVal2", on_message);
+        client.subscribe("/exchange/sensors", on_message);
         console.log('connected');
     };
 var on_error =  function() {
