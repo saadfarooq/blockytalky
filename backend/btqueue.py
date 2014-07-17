@@ -22,3 +22,6 @@ class BTQueue(object):
         channel.queue_bind(exchange='logs', queue=queue_name)
         channel.basic_consume(callback, queue=queue_name, no_ack=True)
         channel.start_consuming()
+
+    def add_timeout(self, timeout_interval, callback):
+        self.connection.add_timeout(timeout_interval, callback)
