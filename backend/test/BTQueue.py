@@ -6,7 +6,7 @@ class BTQueue(object):
     def __init__(self, queue_name):
         self.queue_name = queue_name
         self.connection = ''
-
+    # private methods for creating and closing the channel
     def __channel(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='127.0.0.1'))
         channel = self.connection.channel()
