@@ -1,9 +1,13 @@
 from  multiprocessing import Process
 from btsub import BTSub
 from hardware_module import HardwareModule
+from blockly_webserver import WebServer
 
 if __name__ == "__main__":
   queue = BTSub('saad')
-  hd = HardwareModule(queue)
-  # Now we can connect a client to all these servers
-  Process(target=hd, args=()).start()
+  hm = HardwareModule(queue)
+  ws = WebServer()
+  print 'this should happen'
+  Process(target=hm.start, args=()).start()
+  Process(target=ws.start, args=()).start()
+  print 'this happened'
